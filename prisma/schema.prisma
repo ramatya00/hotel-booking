@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model User {
+  id            String        @id @default(cuid())
+  name          String?
+  email         String?       @unique
+  emailVerified DateTime?
+  image         String?
+  role          String        @default("USER")
+  phone         String?
+  accounts      Account[]
+  reservations  Reservation[]
+
+  @@map("users")
+}
+
+model Room {
+  id          String @id @default(cuid())
+  name        String
+  description String @db.Text
+  price       Int
+  image       String
+  capacity    Int    @default(1)
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  RoomAmenities RoomAmenities[]
+  reservations  Reservation[]
+}
+
+model Amenities {
+  id   String @id @default(cuid())
+  name String
+
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  RoomAmenities RoomAmenities[]
+}
+
+model RoomAmenities {
+  id String @id @default(cuid())
+
+  roomId String
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  amenitiesId String
+  amenities   Amenities @relation(fields: [amenitiesId], references: [id], onDelete: Cascade)
+}
+
+model Reservation {
+  id        String   @id @default(cuid())
+  startDate DateTime
+  endDate   DateTime
+  price     Int
+
+  Payment Payment?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  roomId String
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id     String  @id @default(cuid())
+  method String?
+  amount Int
+  status String  @default("UNPAID")
+
+  reservationId String      @unique
+  reservation   Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Contact {
+  id String @id @default(cuid())
+
+  name    String
+  email   String
+  subject String
+  message String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
