@@ -1,10 +1,12 @@
 "use server"
 
 import { prisma } from "./prisma";
-import { contactSchema, roomSchema } from "./zod";
+import { contactSchema, reserveSchema, roomSchema } from "./zod";
 import { redirect } from "next/navigation";
 import { del } from "@vercel/blob"
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
+import { differenceInCalendarDays } from "date-fns";
 
 type FormState = {
 	message?: string
@@ -157,4 +159,60 @@ export const updateRoom = async (id: string, image: string, prevState: unknown, 
 
 	revalidatePath("/admin/room")
 	redirect("/admin/room");
+}
+
+export const createReserve = async (id: string, price: number, startDate: Date, endDate: Date, prevState: unknown, formData: FormData) => {
+	const session = await auth();
+
+	if (!session || !session.user || !session.user.id) redirect(`/signin?redirect_url=room/${id}`);
+
+	const rawData = {
+		name: formData.get("name"),
+		phone: formData.get("phone"),
+	}
+
+	const validatedFields = reserveSchema.safeParse(rawData);
+
+	if (!validatedFields.success) {
+		return { error: validatedFields.error.flatten().fieldErrors }
+	}
+
+	const { name, phone } = validatedFields.data;
+	const night = differenceInCalendarDays(endDate, startDate)
+	if (night <= 0) return { messageDate: "Date must be at least 1 night" }
+	const total = night * price
+
+	let reservationId
+	try {
+		await prisma.$transaction(async (tx) => {
+			await tx.user.update({
+				where: {
+					id: session.user.id,
+				},
+				data: {
+					name,
+					phone,
+				}
+			});
+			const reservation = await tx.reservation.create({
+				data: {
+					startDate,
+					endDate,
+					price,
+					roomId: id,
+					userId: session.user.id as string,
+					Payment: {
+						create: {
+							amount: total,
+						}
+					}
+				}
+			})
+			reservationId = reservation.id
+		})
+	} catch (error) {
+		console.log(error)
+	}
+
+	redirect(`/checkout/${reservationId}`)
 }

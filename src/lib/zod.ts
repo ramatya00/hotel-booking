@@ -6,7 +6,11 @@ export const roomSchema = object({
 	capacity: coerce.number().gt(0),
 	price: coerce.number().gt(0),
 	amenities: array(string()).nonempty()
+})
 
+export const reserveSchema = object({
+	name: string().min(1),
+	phone: string().min(10),
 })
 
 export const contactSchema = object({
