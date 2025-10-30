@@ -145,3 +145,74 @@ export const getReservationByUserId = async () => {
 		console.log(error)
 	}
 }
+
+export const getRevenueAndReservation = async () => {
+	try {
+		const result = await prisma.reservation.aggregate({
+			_count: true,
+			_sum: { price: true },
+			where: {
+				Payment: {
+					status: { not: "FAILED" }
+				}
+			}
+		})
+		return {
+			revenue: result._sum.price || 0,
+			reservation: result._count
+		}
+	} catch (error) {
+		console.log(error)
+	}
+}
+
+export const getTotalCustomer = async () => {
+	try {
+		const result = await prisma.reservation.findMany({
+			distinct: ["userId"],
+			where: {
+				Payment: {
+					status: { not: "FAILED" }
+				}
+			},
+			select: {
+				userId: true
+			}
+		})
+		return result;
+	} catch (error) {
+		console.log(error)
+	}
+}
+
+export const getReservations = async () => {
+	const session = await auth();
+	if (!session || !session.user || !session.user.id || session.user.role !== "ADMIN") throw new Error("Unauthorized user")
+	try {
+		const result = await prisma.reservation.findMany({
+			include: {
+				room: {
+					select: {
+						name: true,
+						image: true,
+						price: true
+					}
+				},
+				user: {
+					select: {
+						name: true,
+						email: true,
+						phone: true,
+					}
+				},
+				Payment: true
+			},
+			orderBy: {
+				createdAt: "desc"
+			}
+		})
+		return result;
+	} catch (error) {
+		console.log(error)
+	}
+}
