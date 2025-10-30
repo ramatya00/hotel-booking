@@ -2,6 +2,7 @@ import { getReservationById } from "@/lib/data";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { differenceInCalendarDays } from "date-fns";
 import Image from "next/image";
+import PaymentButton from "./payment-button";
 
 export default async function CheckoutDetail({ reservationId }: { reservationId: string }) {
 	const reservation = await getReservationById(reservationId)
@@ -26,7 +27,7 @@ export default async function CheckoutDetail({ reservationId }: { reservationId:
 					</div>
 				</div>
 				{/* Payment Button */}
-
+				<PaymentButton reservation={reservation} />
 			</div>
 			<div className="border border-gray-200 px-3 py-5 bg-white rounded-sm">
 				<table className="w-full">
