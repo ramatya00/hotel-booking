@@ -15,10 +15,10 @@ export default function ReserveForm({ room, disabledDate }: { room: RoomDetailsP
 	const [startDate, setStartDate] = useState(StateDate)
 	const [endDate, setEndDate] = useState(EndDate)
 
-	const handleDateChange = (dates: any) => {
+	const handleDateChange = (dates: [Date | null, Date | null]) => {
 		const [startDate, endDate] = dates
-		setStartDate(startDate)
-		setEndDate(endDate)
+		setStartDate(startDate || StateDate)
+		setEndDate(endDate || EndDate)
 	}
 
 	const [state, formAction, isPending] = useActionState(createReserve.bind(null, room.id, room.price, startDate, endDate), null)

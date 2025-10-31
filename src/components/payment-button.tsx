@@ -30,6 +30,6 @@ export default function PaymentButton({ reservation }: { reservation: Reservatio
 		})
 	}
 	return (
-		<button onClick={handlePayment} className="px-10 py-4 mt-2 text-center font-semibold text-white w-full bg-orange-400 rounded-sm hover:bg-orange-500 cursor-pointer">Process Payment</button>
+		<button onClick={handlePayment} disabled={isPending} className="px-10 py-4 mt-2 text-center font-semibold text-white w-full bg-orange-400 rounded-sm hover:bg-orange-500 cursor-pointer">{isPending ? "Processing..." : "Process Payment"}</button>
 	)
 }
