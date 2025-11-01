@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "./auth";
 
 const protectedRoutes = ["/myreservation", "/admin", "/checkout"];
 
 export async function middleware(req: NextRequest) {
+	const session = await auth();
+	const isLoggedIn = !!session?.user;
+	const role = session?.user?.role;
 	const { pathname } = req.nextUrl;
-
-	// Check session cookie manually
-	const token =
-		req.cookies.get("next-auth.session-token") ||
-		req.cookies.get("__Secure-next-auth.session-token");
-
-	const isLoggedIn = !!token;
 
 	if (!isLoggedIn && protectedRoutes.some((route) => pathname.startsWith(route))) {
 		return NextResponse.redirect(new URL("/signin", req.url));
 	}
 
-	// Optional: restrict admin
-	if (isLoggedIn && pathname.startsWith("/admin")) {
-		// ❗You can't check roles here without decoding the JWT, so handle role restriction in the /admin page or API route.
+	if (isLoggedIn && role !== "ADMIN" && pathname.startsWith("/admin")) {
+		return NextResponse.redirect(new URL("/", req.url));
 	}
 
 	if (isLoggedIn && pathname.startsWith("/signin")) {
