@@ -1,7 +1,6 @@
 import { getReservations } from "@/lib/data";
 import Image from "next/image";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { DeleteButton, EditButton } from "@/components/admin/room/button";
 import clsx from "clsx";
 
 export default async function ReservationList() {
