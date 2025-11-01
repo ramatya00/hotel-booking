@@ -1,9 +1,14 @@
 import RoomTable from "@/components/admin/room/room-table";
 import Link from "next/link";
 import { Suspense } from "react";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 
-export default function RoomPage() {
+export default async function RoomPage() {
+	const session = await auth();
+	const role = session?.user?.role;
+	if (role !== "ADMIN") redirect("/");
 	return <div className="max-w-screen-xl px-4 py-16 mt-10 mx-auto">
 		<div className="flex items-center justify-between">
 			<h1 className="text-4xl font-bold text-gray-800">Room List</h1>
