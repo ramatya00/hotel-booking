@@ -74,7 +74,7 @@ export const POST = async (request: Request) => {
 
 		// Update payment
 		if (paymentStatus) {
-			const updatedPayment = await prisma.payment.update({
+			await prisma.payment.update({
 				data: {
 					method: paymentType,
 					status: paymentStatus,
