@@ -16,7 +16,7 @@ export default function PaymentFailure() {
 					<h3 className="md:text-2xl text-base text-gray-900 font-semibold text-center">Payment Failed!</h3>
 					<p className="text-gray-600 my-2">Payment has failed.</p>
 					<p> Please try again or contact our support team for assistance.</p>
-					<Link href={"/myreservation"} className="px-12 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3" >GO TO MY RESERVATION</Link>
+					<Link href={"/myreservation"} className="px-12 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 block" >GO TO MY RESERVATION</Link>
 				</div>
 			</div>
 		</div>

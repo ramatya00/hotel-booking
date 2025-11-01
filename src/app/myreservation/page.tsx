@@ -15,8 +15,7 @@ export default async function MyReservation() {
 			<div className="max-w-screen-lg mx-auto mt-10 py-20 px-4">
 				<div className="flex items-center justify-between">
 					<div className="">
-						<h3 className="text-xl text-gray-800 mt-2">Hi, {session?.user?.name}</h3>
-						<p>Here&apos;s your book history :</p>
+						<h3 className="text-xl text-gray-800 mt-2 mb-2">Hi, {session?.user?.name}</h3>
 					</div>
 				</div>
 				<div className="rounded-sm">
