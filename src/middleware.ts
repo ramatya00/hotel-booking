@@ -1,10 +1,10 @@
-import { auth } from "@/auth";
+import { getSession } from "@/auth.edge";
 import { NextResponse, NextRequest } from "next/server";
 
 const ProtectedRoutes = ["/myreservation", "/admin", "/checkout"];
 
 export async function middleware(request: NextRequest) {
-	const session = await auth();
+	const session = await getSession(request);
 	const isLoggedIn = !!session?.user;
 	const role = session?.user.role;
 	const { pathname } = request.nextUrl;
@@ -23,5 +23,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/myreservation/:path*", "/admin/:path*", "/checkout/:path*", "/signin"]
+	matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"]
 }
