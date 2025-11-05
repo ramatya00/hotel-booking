@@ -1,35 +1,27 @@
-import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/auth";
+import { NextResponse, NextRequest } from "next/server";
 
-const protectedRoutes = ["/myreservation", "/admin", "/checkout"];
+const ProtectedRoutes = ["/myreservation", "/admin", "/checkout"];
 
-// Exclude API routes from middleware to allow Midtrans webhooks
-export const config = {
-	matcher: [
-		/*
-		 * Match all request paths except:
-		 * - api routes (except those that need auth)
-		 * - _next/static (static files)
-		 * - _next/image (image optimization files)
-		 * - favicon.ico (favicon file)
-		 */
-		"/((?!api|_next/static|_next/image|favicon.ico).*)",
-	],
-};
+export async function middleware(request: NextRequest) {
+	const session = await auth();
+	const isLoggedIn = !!session?.user;
+	const role = session?.user.role;
+	const { pathname } = request.nextUrl;
 
-export async function middleware(req: NextRequest) {
-	const token = req.cookies.get("authjs.session-token") || req.cookies.get("__Secure-authjs.session-token");
-	const isLoggedIn = !!token;
-	const { pathname } = req.nextUrl;
+	if (!isLoggedIn && ProtectedRoutes.some((route) => pathname.startsWith(route))) {
+		return NextResponse.redirect(new URL("/login", request.url));
+	}
 
-	// Basic auth check
-	if (!isLoggedIn && protectedRoutes.some((route) => pathname.startsWith(route))) {
-		return NextResponse.redirect(new URL("/signin", req.url));
+	if (isLoggedIn && role !== "ADMIN" && pathname.startsWith("/admin")) {
+		return NextResponse.redirect(new URL("/", request.url));
 	}
 
 	if (isLoggedIn && pathname.startsWith("/signin")) {
-		return NextResponse.redirect(new URL("/", req.url));
+		return NextResponse.redirect(new URL("/", request.url));
 	}
+}
 
-	// For admin routes, let the page component handle role verification
-	return NextResponse.next();
+export const config = {
+	matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"]
 }
