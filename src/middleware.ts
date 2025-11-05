@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { jwtVerify } from "jose";
 
 const ProtectedRoutes = ["/myreservation", "/admin", "/checkout"];
 
@@ -7,21 +6,20 @@ export async function middleware(request: NextRequest) {
 	const token = request.cookies.get("authjs.session-token")?.value ||
 		request.cookies.get("__Secure-authjs.session-token")?.value;
 
-	let session = null;
+	const isLoggedIn = !!token;
 
+	// Extract role from token without verification (basic decode)
+	let role = null;
 	if (token) {
 		try {
-			const secret = new TextEncoder().encode(process.env.AUTH_SECRET);
-			const { payload } = await jwtVerify(token, secret);
-			session = payload;
+			const payload = token.split('.')[1];
+			const decoded = JSON.parse(atob(payload));
+			role = decoded.role;
 		} catch (error) {
-			// Invalid token
-			session = null;
+			// Invalid token format
 		}
 	}
 
-	const isLoggedIn = !!session;
-	const role = session?.role;
 	const { pathname } = request.nextUrl;
 
 	if (!isLoggedIn && ProtectedRoutes.some((route) => pathname.startsWith(route))) {
