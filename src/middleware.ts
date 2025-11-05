@@ -1,12 +1,27 @@
-import { getSession } from "@/auth.edge";
 import { NextResponse, NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
 const ProtectedRoutes = ["/myreservation", "/admin", "/checkout"];
 
 export async function middleware(request: NextRequest) {
-	const session = await getSession(request);
-	const isLoggedIn = !!session?.user;
-	const role = session?.user.role;
+	const token = request.cookies.get("authjs.session-token")?.value ||
+		request.cookies.get("__Secure-authjs.session-token")?.value;
+
+	let session = null;
+
+	if (token) {
+		try {
+			const secret = new TextEncoder().encode(process.env.AUTH_SECRET);
+			const { payload } = await jwtVerify(token, secret);
+			session = payload;
+		} catch (error) {
+			// Invalid token
+			session = null;
+		}
+	}
+
+	const isLoggedIn = !!session;
+	const role = session?.role;
 	const { pathname } = request.nextUrl;
 
 	if (!isLoggedIn && ProtectedRoutes.some((route) => pathname.startsWith(route))) {
