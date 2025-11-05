@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	if (!isLoggedIn && ProtectedRoutes.some((route) => pathname.startsWith(route))) {
-		return NextResponse.redirect(new URL("/login", request.url));
+		return NextResponse.redirect(new URL("/signin", request.url));
 	}
 
 	if (isLoggedIn && role !== "ADMIN" && pathname.startsWith("/admin")) {
