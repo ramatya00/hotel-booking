@@ -1,14 +1,9 @@
 import EditRoom from "@/components/admin/room/edit-room"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
-import { auth } from "@/auth"
-import { redirect } from "next/navigation"
 
 
 export default async function EditRoomPage({ params }: { params: Promise<{ id: string }> }) {
-	const session = await auth();
-	const role = session?.user?.role;
-	if (role !== "ADMIN") redirect("/");
 	const roomId = (await params).id
 	if (!roomId) return notFound()
 
