@@ -1,16 +1,20 @@
-import { auth } from "@/auth";
 import { NextResponse, NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 const ProtectedRoutes = ["/myreservation", "/admin", "/checkout"];
 
 export async function middleware(request: NextRequest) {
-	const session = await auth();
-	const isLoggedIn = !!session?.user;
-	const role = session?.user.role;
+	const token = await getToken({
+		req: request,
+		secret: process.env.AUTH_SECRET
+	});
+
+	const isLoggedIn = !!token;
+	const role = token?.role;
 	const { pathname } = request.nextUrl;
 
 	if (!isLoggedIn && ProtectedRoutes.some((route) => pathname.startsWith(route))) {
-		return NextResponse.redirect(new URL("/login", request.url));
+		return NextResponse.redirect(new URL("/signin", request.url));
 	}
 
 	if (isLoggedIn && role !== "ADMIN" && pathname.startsWith("/admin")) {
