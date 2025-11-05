@@ -70,6 +70,7 @@ export const getReservationById = async (id: string) => {
 			include: {
 				room: {
 					select: {
+						id: true,
 						name: true,
 						image: true,
 						price: true
