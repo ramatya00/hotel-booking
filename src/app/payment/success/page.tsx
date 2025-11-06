@@ -19,8 +19,8 @@ export default async function PaymentSuccess({ searchParams }: { searchParams: P
 				<div className="text-center">
 					<h3 className="md:text-2xl text-base text-gray-900 font-semibold text-center">Payment Done!</h3>
 					<p className="text-gray-600 my-2">Thank you for completing your secure online payment.</p>
-					<p>Have a great day!</p>
-					<Link href={"/myreservation"} className="px-12 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 block" >GO TO MY RESERVATION</Link>
+					<p className="mb-2">Have a great day!</p>
+					<Link href={"/myreservation"} className="px-12 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 block w-fit mx-auto" >GO TO MY RESERVATION</Link>
 				</div>
 			</div>
 		</div>

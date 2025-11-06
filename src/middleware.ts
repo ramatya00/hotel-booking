@@ -8,26 +8,10 @@ export async function middleware(request: NextRequest) {
 
 	const isLoggedIn = !!token;
 
-	// Extract role from token without verification (basic decode)
-	let role = null;
-	if (token) {
-		try {
-			const payload = token.split('.')[1];
-			const decoded = JSON.parse(atob(payload));
-			role = decoded.role;
-		} catch (error) {
-			// Invalid token format
-		}
-	}
-
 	const { pathname } = request.nextUrl;
 
 	if (!isLoggedIn && ProtectedRoutes.some((route) => pathname.startsWith(route))) {
 		return NextResponse.redirect(new URL("/signin", request.url));
-	}
-
-	if (isLoggedIn && role !== "ADMIN" && pathname.startsWith("/admin")) {
-		return NextResponse.redirect(new URL("/", request.url));
 	}
 
 	if (isLoggedIn && pathname.startsWith("/signin")) {
