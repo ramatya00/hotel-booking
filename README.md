@@ -1,10 +1,8 @@
 # HOTEL BOOKING APP
 
-Modern hotel booking web application with authentication, admin management, image uploads, and online payments.
+**Link:** [booking-hotel-alpha.vercel.app](https://booking-hotel-alpha.vercel.app)
 
-**Link:** [hotel-booking.vercel.app](https://hotel-booking.vercel.app)
-
-<img src="./public/preview-readme.png" alt="Hotel Booking App" width="768" height="auto">
+<img src="./public/readme-preview.png" alt="Hotel Booking App" width="768" height="auto">
 
 ## Project Purpose
 
